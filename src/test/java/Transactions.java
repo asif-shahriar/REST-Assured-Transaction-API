@@ -125,7 +125,8 @@ public class Transactions {
         Assert.assertEquals("Ella Schowalter II", name);
     }
 
-    public Integer Random;
+    public Integer RandomU;
+    public Integer RandomA;
     public String name;
     public String email;
     public String nid;
@@ -142,15 +143,21 @@ public class Transactions {
                         .assertThat().statusCode(200).extract().response();
 
         JsonPath resObj = response.jsonPath();
-        Random = (int) Math.floor(Math.random() * (9999999 - 1000000) + 1);
-        String phone = "0152" + Random;
-        name = "Mr. " + resObj.get("results[0].name.last");
+        RandomU = (int) Math.floor(Math.random() * (9999999 - 1000000) + 1);
+        String phone = "0152" + RandomU;
+        RandomA = (int) Math.floor(Math.random() * (9999999 - 1000000) + 1);
+        String agent_phone = "0197" + RandomA;
+
+        String first = resObj.get("results[0].name.first");
+        String last = resObj.get("results[0].name.last");
+        name = first + " " + last;
         email = resObj.get("results[0].email");
         nid = resObj.get("results[0].login.uuid");
         Utils.setEnvVariable("name", name);
         Utils.setEnvVariable("email", email);
         Utils.setEnvVariable("nid", nid);
         Utils.setEnvVariable("phone_number", phone);
+        Utils.setEnvVariable("agent_phone_number", agent_phone);
         System.out.println(response.asString());
     }
 
@@ -162,17 +169,18 @@ public class Transactions {
                         .contentType("application/json")
                         .header("Authorization", props.getProperty("token"))
                         .header("X-AUTH-SECRET-KEY", props.getProperty("secretAuthKey"))
-                        .body("" +
-                                "{\"name\":" + props.getProperty("name") + ",\n" +
-                                "    \"email\":\"" + props.getProperty("email") + "\", \n" +
-                                "    \"password\":\"" + "1234" + "\",\n" +
+                        .body("{\n" +
+                                "    \"name\":\"" + props.getProperty("name") + "\",\n" +
+                                "    \"email\":\"" + props.getProperty("email") + "\",\n" +
+                                "    \"password\":\"1234\",\n" +
                                 "    \"phone_number\":\"" + props.getProperty("phone_number") + "\",\n" +
                                 "    \"nid\":\"" + props.getProperty("nid") + "\",\n" +
-                                "    \"role\":\"" + "Customer" + "\"}")
+                                "    \"role\":\"Customer\"\n" +
+                                "}")
                         .when()
                         .post("/user/create")
                         .then()
-                        .extract().response();
+                        .assertThat().statusCode(201).extract().response();
 
         System.out.println(response.asString());
     }
@@ -185,13 +193,14 @@ public class Transactions {
                         .contentType("application/json")
                         .header("Authorization", props.getProperty("token"))
                         .header("X-AUTH-SECRET-KEY", props.getProperty("secretAuthKey"))
-                        .body("" +
-                                "{\"name\":" + "Jobbar" + ",\n" +
-                                "    \"email\":\"" + "jobbar@test,com" + "\", \n" +
-                                "    \"password\":\"" + "1234" + "\",\n" +
-                                "    \"phone_number\":\"" + "01971856225" + "\",\n" +
+                        .body("{\n" +
+                                "    \"name\":\"" + props.getProperty("name") + "\",\n" +
+                                "    \"email\":\"" + props.getProperty("email") + "\",\n" +
+                                "    \"password\":\"1234\",\n" +
+                                "    \"phone_number\":\"" + props.getProperty("agent_phone_number") + "\",\n" +
                                 "    \"nid\":\"" + props.getProperty("nid") + "\",\n" +
-                                "    \"role\":\"" + "Agent" + "\"}")
+                                "    \"role\":\"Agent\"\n" +
+                                "}")
                         .when()
                         .post("/user/create")
                         .then()
@@ -208,13 +217,14 @@ public class Transactions {
                         .contentType("application/json")
                         .header("Authorization", props.getProperty("token"))
                         .header("X-AUTH-SECRET-KEY", props.getProperty("secretAuthKey"))
-                        .body("" +
-                                "{\"name\":" + "Alfred" + ",\n" +
-                                "    \"email\":\"" + "jondoe@test,com" + "\", \n" +
-                                "    \"password\":\"" + "1234" + "\",\n" +
-                                "    \"phone_number\":\"" + "372-315-9957" + "\",\n" +
-                                "    \"nid\":\"" + "1a189c8a-b3e4-4534-90fc-b3ae76507a9d" + "\",\n" +
-                                "    \"role\":\"" + "Customer" + "\"}")
+                        .body("{\n" +
+                                "    \"name\": \"Modon Kumar\",\n" +
+                                "    \"email\": \"modon@yahoo.com\",\n" +
+                                "    \"password\": \"332211\",\n" +
+                                "    \"phone_number\": \"372-315-9985\",\n" +
+                                "    \"nid\": \"1a189c8a-b3e4-4534-90fc-b3ae76337a9d\",\n" +
+                                "    \"role\": \"Customer\"\n" +
+                                "}")
                         .when()
                         .put("/user/update/15")
                         .then()
@@ -246,10 +256,11 @@ public class Transactions {
                         .contentType("application/json")
                         .header("Authorization", props.getProperty("token"))
                         .header("X-AUTH-SECRET-KEY", props.getProperty("secretAuthKey"))
-                        .body("" +
-                                "{\"from_account\":" + "SYSTEM" + ",\n" +
-                                "    \"to_account\":\"" + "01525124847" + "\", \n" +
-                                "    \"amount\":\"" + 1000 + "\"}")
+                        .body("{\n" +
+                                "    \"from_account\":\"SYSTEM\",\n" +
+                                "    \"to_account\":\"01525124847\",\n" +
+                                "    \"amount\":1000\n" +
+                                "}")
                         .when()
                         .post("/transaction/deposit")
                         .then()
@@ -266,10 +277,11 @@ public class Transactions {
                         .contentType("application/json")
                         .header("Authorization", props.getProperty("token"))
                         .header("X-AUTH-SECRET-KEY", props.getProperty("secretAuthKey"))
-                        .body("" +
-                                "{\"from_account\":" + "01971819289" + ",\n" +
-                                "    \"to_account\":\"" + "01525124847" + "\", \n" +
-                                "    \"amount\":\"" + 1000 + "\"}")
+                        .body("{\n" +
+                                "    \"from_account\":\"01971819289\",\n" +
+                                "    \"to_account\":\"01525124847\",\n" +
+                                "    \"amount\":10000\n" +
+                                "}")
                         .when()
                         .post("/transaction/deposit")
                         .then()
@@ -304,10 +316,11 @@ public class Transactions {
                         .contentType("application/json")
                         .header("Authorization", props.getProperty("token"))
                         .header("X-AUTH-SECRET-KEY", props.getProperty("secretAuthKey"))
-                        .body("" +
-                                "{\"from_account\":" + "01525124847" + ",\n" +
-                                "    \"to_account\":\"" + "01526809412" + "\", \n" +
-                                "    \"amount\":\"" + 500 + "\"}")
+                        .body("{\n" +
+                                "    \"from_account\":\"01525124847\",\n" +
+                                "    \"to_account\":\"01526809412\",\n" +
+                                "    \"amount\":500\n" +
+                                "}")
                         .when()
                         .post("/transaction/sendmoney")
                         .then()
@@ -337,10 +350,11 @@ public class Transactions {
                         .contentType("application/json")
                         .header("Authorization", props.getProperty("token"))
                         .header("X-AUTH-SECRET-KEY", props.getProperty("secretAuthKey"))
-                        .body("" +
-                                "{\"from_account\":" + "01526809412" + ",\n" +
-                                "    \"to_account\":\"" + "01971819475" + "\", \n" +
-                                "    \"amount\":\"" + 100 + "\"}")
+                        .body("{\n" +
+                                "    \"from_account\":\"01526809412\",\n" +
+                                "    \"to_account\":\"01971819475\",\n" +
+                                "    \"amount\":100\n" +
+                                "}")
                         .when()
                         .post("/transaction/withdraw")
                         .then()
