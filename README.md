@@ -18,4 +18,6 @@ allure generate allure-results --clean -o allure-report
 allure serve allure-results
 ```
 
-These are the snapshots of the allure reports:
+This is the snapshot of the allure reports:
+
+![Screenshot_1](https://user-images.githubusercontent.com/71173675/152676873-59321129-513a-4a60-991a-da4d12279975.png)
